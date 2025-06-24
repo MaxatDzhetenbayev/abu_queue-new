@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URI")
+}
+
+
+model Specialist {
+	id        String   @id @default(cuid())
+	login     String   @unique
+	password  String	 @map("password_hash")
+	table     String	 @unique
+	isAvailable Boolean @default(true)
+	createdAt DateTime @default(now())
+	updatedAt DateTime @updatedAt
+
+	queues Queue[]
+
+	@@map("specialists")
+}
+
+model Queue {
+	id        String   @id @default(cuid())
+
+	disciplineId String
+	discipline Discipline @relation(fields: [disciplineId], references: [id])
+	status    QueueStatus @default(WAITING)
+
+	specialist Specialist? @relation(fields: [specialistId], references: [id])
+	specialistId String? @map("specialist_id")
+
+	createdAt DateTime @default(now())
+	updatedAt DateTime @updatedAt
+
+	@@map("queues")
+}
+
+model Discipline {
+	id        String   @id @default(cuid())
+	name      String   @unique
+	createdAt DateTime @default(now())
+	updatedAt DateTime @updatedAt
+
+	queues    Queue[]
+
+	@@map("disciplines")
+}
+
+
+enum QueueStatus {
+  WAITING
+  CALLED
+  COMPLETED
+  SKIPPED
+}
