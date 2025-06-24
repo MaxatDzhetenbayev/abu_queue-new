@@ -34,6 +34,20 @@ export class DisciplineController {
   }
 
   @ApiOperation({
+    summary: 'Создание дисциплины(множества)',
+    description: 'Создает запись дисциплины в системе. ',
+  })
+  @ApiBody({
+    type: CreateDisciplineDto,
+    description: 'Данные для создания дисциплины',
+  })
+  @HttpCode(HttpStatus.CREATED)
+  @Post('/many')
+  createMany(@Body() createDisciplineDto: CreateDisciplineDto[]) {
+    return this.disciplineService.createMany(createDisciplineDto);
+  }
+
+  @ApiOperation({
     summary: 'Получение всех дисциплин',
     description: 'Возвращает список всех дисциплин, доступных в системе.',
   })

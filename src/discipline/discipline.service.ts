@@ -40,6 +40,33 @@ export class DisciplineService {
       );
     }
   }
+
+  async createMany(createDisciplineDto: CreateDisciplineDto[]) {
+    this.logger.log('Создание дисциплины', createDisciplineDto);
+
+    try {
+      const disciplines = await this.prismaService.discipline.createMany({
+        data: createDisciplineDto,
+      });
+
+      if (!disciplines.count || disciplines.count === 0) {
+        this.logger.error('Ошибка при создании дисциплины');
+        throw new Error('Ошибка при создании дисциплины');
+      }
+
+      this.logger.log('Дисциплина успешно создана', disciplines);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new InternalServerErrorException(error.message);
+      }
+
+      this.logger.error('Ошибка при создании дисциплины', error);
+      throw new InternalServerErrorException(
+        'Не удалось создать категорию услуги.',
+      );
+    }
+  }
+
   async findAll() {
     return await this.prismaService.discipline.findMany();
   }

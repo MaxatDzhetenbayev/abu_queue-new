@@ -32,3 +32,40 @@ export class ResponseQueueStatusDto {
   })
   peopleAhead: number;
 }
+
+class CurrentQueue {
+  @ApiProperty({
+    description: 'Уникальный идентификатор текущей очереди',
+    example: 'cmca6vqqz0000l1ngjnls3d8q',
+  })
+  id: string;
+
+  @ApiProperty({
+    description: 'Название дисциплины текущей очереди',
+    example: '6В01101 Педагогика и психология',
+  })
+  discipline: string;
+
+  @ApiProperty({
+    description: 'Статус текущей очереди',
+    example: 'WAITING',
+  })
+  status: string;
+}
+
+export class ResponseQueueSpecialistStatusDto {
+  @ApiProperty({
+    type: () => CurrentQueue,
+    nullable: true,
+    required: false,
+    description:
+      'Информация о текущем абитуриенте в статусе CALLED (если есть)',
+  })
+  current: CurrentQueue | null;
+
+  @ApiProperty({
+    description: 'Количество абитуриентов в очереди со статусом WAITING',
+    example: 3,
+  })
+  waitingCount: number;
+}

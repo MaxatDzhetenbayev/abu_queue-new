@@ -16,7 +16,10 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ResponseQueueStatusDto } from './dto/response-queue.dto';
+import {
+  ResponseQueueSpecialistStatusDto,
+  ResponseQueueStatusDto,
+} from './dto/response-queue.dto';
 import { Authorization } from '@/auth/decorators/auth.decorator';
 import { Authorized } from '@/auth/decorators/authorized.decorator';
 
@@ -59,8 +62,21 @@ export class QueueController {
     return this.queueService.getQueueStatus(id);
   }
 
-  @HttpCode(HttpStatus.OK)
-  @Post('call')
+  @ApiOperation({
+    summary: 'Получение очереди специалиста',
+    description: 'Получает статус текущей очереди специалиста',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Статус текущей очереди специалиста успешно получен',
+    type: ResponseQueueSpecialistStatusDto,
+  })
+  @Authorization()
+  @Get('specialist/status')
+  getQueueSpecialistStatus(@Authorized('id') specialistId: string) {
+    return this.queueService.getSpecialistQueueStatus(specialistId);
+  }
+
   @ApiOperation({
     summary: 'Вызов следующего абитуриента',
     description: 'Специалист вызывает следующего в очереди',
@@ -73,6 +89,8 @@ export class QueueController {
       },
     },
   })
+  @HttpCode(HttpStatus.OK)
+  @Post('call')
   @Authorization()
   callNext(@Authorized('id') specialistId: string) {
     return this.queueService.callNext(specialistId);

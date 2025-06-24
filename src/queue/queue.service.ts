@@ -128,7 +128,7 @@ export class QueueService {
     });
 
     if (alreadyCalled) {
-      this.prisma.queue.update({
+      await this.prisma.queue.update({
         where: { id: alreadyCalled.id },
         data: { status: QueueStatus.COMPLETED },
       });
@@ -163,24 +163,43 @@ export class QueueService {
     return {
       queueId: updated.id,
       discipline: nextQueue.discipline.name,
-      table: specialist.table,
       message: 'Абитуриент вызван',
     };
   }
 
-  findAll() {
-    return `This action returns all queue`;
-  }
+  async getSpecialistQueueStatus(specialistId: string) {
+    // 1. Найти текущего вызванного
+    const current = await this.prisma.queue.findFirst({
+      where: {
+        specialistId,
+        status: QueueStatus.CALLED,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+      include: {
+        discipline: true,
+      },
+    });
 
-  findOne(id: number) {
-    return `This action returns a #${id} queue`;
-  }
+    // 2. Посчитать ожидающих (WAITING)
+    const waitingCount = await this.prisma.queue.count({
+      where: {
+        specialistId,
+        status: QueueStatus.WAITING,
+      },
+    });
 
-  update(id: number, updateQueueDto: UpdateQueueDto) {
-    return `This action updates a #${id} queue`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} queue`;
+    return {
+      current: current
+        ? {
+            id: current.id,
+            discipline: current.discipline.name,
+            status: current.status,
+            startedAt: current.createdAt,
+          }
+        : null,
+      waitingCount,
+    };
   }
 }
