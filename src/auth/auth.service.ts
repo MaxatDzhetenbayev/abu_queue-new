@@ -48,6 +48,7 @@ export class AuthService {
 
     return res.json({
       message: 'Login successful',
+      table: specialist.table,
     });
   }
 
