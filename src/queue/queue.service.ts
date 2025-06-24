@@ -74,7 +74,7 @@ export class QueueService {
     return newQueue;
   }
 
-  async getQueueStatus(queueId: string) {
+  async getQueueStatus(queueId: number) {
     // 1. Получаем саму запись очереди
     const queue = await this.prisma.queue.findUnique({
       where: { id: queueId },

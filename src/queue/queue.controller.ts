@@ -59,7 +59,7 @@ export class QueueController {
   })
   @Get('status/:id')
   getQueueStatus(@Param('id') id: string) {
-    return this.queueService.getQueueStatus(id);
+    return this.queueService.getQueueStatus(+id);
   }
 
   @ApiOperation({
