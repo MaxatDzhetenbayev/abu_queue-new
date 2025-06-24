@@ -4,6 +4,7 @@ import { SpecialistModule } from './specialist/specialist.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '@/auth/auth.module';
+import { DisciplineModule } from './discipline/discipline.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AuthModule } from '@/auth/auth.module';
       isGlobal: true,
       envFilePath: ['.env'],
     }),
+    DisciplineModule,
   ],
 })
 export class AppModule {}
