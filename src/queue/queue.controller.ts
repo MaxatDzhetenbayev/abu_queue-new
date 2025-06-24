@@ -17,6 +17,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import {
+  ResponseQueueDisplayDto,
   ResponseQueueSpecialistStatusDto,
   ResponseQueueStatusDto,
 } from './dto/response-queue.dto';
@@ -96,23 +97,19 @@ export class QueueController {
     return this.queueService.callNext(specialistId);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.queueService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.queueService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateQueueDto: UpdateQueueDto) {
-  //   return this.queueService.update(+id, updateQueueDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.queueService.remove(+id);
-  // }
+  @ApiOperation({
+    summary: 'Отображение списка очереди для столов',
+    description: 'Получает список очередей для всех столов',
+  })
+  @ApiResponse({
+    type: ResponseQueueDisplayDto,
+    isArray: true,
+    status: HttpStatus.OK,
+    description: 'Список очередей для столов успешно получен',
+  })
+  @HttpCode(HttpStatus.OK)
+  @Get('display')
+  display() {
+    return this.queueService.getDisplay();
+  }
 }

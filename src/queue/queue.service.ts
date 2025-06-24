@@ -1,11 +1,5 @@
-import {
-  ConflictException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateQueueDto } from './dto/create-queue.dto';
-import { UpdateQueueDto } from './dto/update-queue.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { QueueStatus } from 'generated/prisma';
 
@@ -201,5 +195,24 @@ export class QueueService {
         : null,
       waitingCount,
     };
+  }
+
+  async getDisplay() {
+    const specialists = await this.prisma.specialist.findMany({
+      include: {
+        queues: {
+          where: {
+            status: QueueStatus.CALLED,
+          },
+        },
+      },
+    });
+
+    const tableQueues = specialists.map((table) => ({
+      table: table.table,
+      queue: table.queues[0].id,
+    }));
+
+    return tableQueues;
   }
 }

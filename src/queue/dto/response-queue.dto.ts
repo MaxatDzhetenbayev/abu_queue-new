@@ -69,3 +69,17 @@ export class ResponseQueueSpecialistStatusDto {
   })
   waitingCount: number;
 }
+
+export class ResponseQueueDisplayDto {
+  @ApiProperty({
+    description: 'Стол из списка',
+    example: '3',
+  })
+  table: string;
+
+  @ApiProperty({
+    description: 'Количество абитуриентов в очереди со статусом WAITING',
+    example: 102,
+  })
+  queue: number;
+}
