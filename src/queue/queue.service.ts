@@ -128,7 +128,10 @@ export class QueueService {
     });
 
     if (alreadyCalled) {
-      throw new ConflictException('Уже есть вызванный абитуриент');
+      this.prisma.queue.update({
+        where: { id: alreadyCalled.id },
+        data: { status: QueueStatus.COMPLETED },
+      });
     }
 
     // 3. Поиск самого раннего WAITING
