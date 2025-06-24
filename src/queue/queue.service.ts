@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateQueueDto } from './dto/create-queue.dto';
 import { UpdateQueueDto } from './dto/update-queue.dto';
 import { PrismaService } from '@/prisma/prisma.service';
@@ -101,6 +106,62 @@ export class QueueService {
       status: queue.status,
       position: aheadInQueue + 1,
       peopleAhead: aheadInQueue,
+    };
+  }
+
+  async callNext(specialistId: string) {
+    // 1. Проверка существования специалиста
+    const specialist = await this.prisma.specialist.findUnique({
+      where: { id: specialistId },
+    });
+
+    if (!specialist) {
+      throw new NotFoundException('Специалист не найден');
+    }
+
+    // 2. Проверка: не вызван ли уже кто-то
+    const alreadyCalled = await this.prisma.queue.findFirst({
+      where: {
+        specialistId,
+        status: QueueStatus.CALLED,
+      },
+    });
+
+    if (alreadyCalled) {
+      throw new ConflictException('Уже есть вызванный абитуриент');
+    }
+
+    // 3. Поиск самого раннего WAITING
+    const nextQueue = await this.prisma.queue.findFirst({
+      where: {
+        specialistId,
+        status: QueueStatus.WAITING,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+      include: {
+        discipline: true,
+      },
+    });
+
+    if (!nextQueue) {
+      throw new NotFoundException('В очереди никого нет');
+    }
+
+    // 4. Обновляем статус на CALLED
+    const updated = await this.prisma.queue.update({
+      where: { id: nextQueue.id },
+      data: {
+        status: QueueStatus.CALLED,
+      },
+    });
+
+    return {
+      queueId: updated.id,
+      discipline: nextQueue.discipline.name,
+      table: specialist.table,
+      message: 'Абитуриент вызван',
     };
   }
 

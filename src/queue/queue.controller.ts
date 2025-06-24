@@ -17,6 +17,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ResponseQueueStatusDto } from './dto/response-queue.dto';
+import { Authorization } from '@/auth/decorators/auth.decorator';
+import { Authorized } from '@/auth/decorators/authorized.decorator';
 
 @ApiTags('Queue - Управление очередями')
 @Controller('queue')
@@ -55,6 +57,25 @@ export class QueueController {
   @Get('status/:id')
   getQueueStatus(@Param('id') id: string) {
     return this.queueService.getQueueStatus(id);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('call')
+  @ApiOperation({
+    summary: 'Вызов следующего абитуриента',
+    description: 'Специалист вызывает следующего в очереди',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        specialistId: { type: 'string', example: 'clzx...' },
+      },
+    },
+  })
+  @Authorization()
+  callNext(@Authorized('id') specialistId: string) {
+    return this.queueService.callNext(specialistId);
   }
 
   // @Get()
