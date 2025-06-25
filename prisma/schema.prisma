@@ -32,10 +32,8 @@ model Specialist {
 model Queue {
 	id        Int      @id @default(autoincrement())
 
-	disciplineId String
-	discipline Discipline @relation(fields: [disciplineId], references: [id])
 	status    QueueStatus @default(WAITING)
-
+	discipline String @default("Получение услуги")
 	specialist Specialist? @relation(fields: [specialistId], references: [id])
 	specialistId String? @map("specialist_id")
 
@@ -43,17 +41,6 @@ model Queue {
 	updatedAt DateTime @updatedAt
 
 	@@map("queues")
-}
-
-model Discipline {
-	id        String   @id @default(cuid())
-	name      String   @unique
-	createdAt DateTime @default(now())
-	updatedAt DateTime @updatedAt
-
-	queues    Queue[]
-
-	@@map("disciplines")
 }
 
 

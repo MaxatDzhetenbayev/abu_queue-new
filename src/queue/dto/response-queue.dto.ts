@@ -7,8 +7,8 @@ export class ResponseQueueStatusDto {
   })
   queueId: string;
   @ApiProperty({
-    description: 'Название дисциплины',
-    example: '6В01101 Педагогика и психология',
+    description: 'Название услуги',
+    example: 'Получение услуги',
   })
   discipline: string;
   @ApiProperty({
@@ -41,8 +41,8 @@ class CurrentQueue {
   id: string;
 
   @ApiProperty({
-    description: 'Название дисциплины текущей очереди',
-    example: '6В01101 Педагогика и психология',
+    description: 'Название услуги',
+    example: 'Получение услуги',
   })
   discipline: string;
 

@@ -5,7 +5,6 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '@/auth/auth.module';
 import { QueueModule } from './queue/queue.module';
-import { DisciplineModule } from './discipline/discipline.module';
 
 @Module({
   imports: [
@@ -17,7 +16,6 @@ import { DisciplineModule } from './discipline/discipline.module';
       envFilePath: ['.env'],
     }),
     QueueModule,
-    DisciplineModule,
   ],
 })
 export class AppModule {}

@@ -1,5 +1,4 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { CreateQueueDto } from './dto/create-queue.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { QueueStatus } from 'generated/prisma';
 
@@ -9,19 +8,8 @@ export class QueueService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(dto: CreateQueueDto) {
-    const { disciplineId } = dto;
-
-    // 1. Проверка дисциплины
-    const discipline = await this.prisma.discipline.findUnique({
-      where: { id: disciplineId },
-    });
-
-    if (!discipline) {
-      throw new NotFoundException('Дисциплина не найдена');
-    }
-
-    // 2. Получение всех активных специалистов с количеством очередей в статусе WAITING
+  async create() {
+    // 1. Получение всех активных специалистов с количеством очередей в статусе WAITING
     const specialists = await this.prisma.specialist.findMany({
       where: {
         isAvailable: true,
@@ -56,7 +44,6 @@ export class QueueService {
     // 5. Создаем запись очереди
     const newQueue = await this.prisma.queue.create({
       data: {
-        disciplineId,
         specialistId: selectedSpecialist.id,
         status: QueueStatus.WAITING,
       },
@@ -73,7 +60,6 @@ export class QueueService {
     const queue = await this.prisma.queue.findUnique({
       where: { id: queueId },
       include: {
-        discipline: true,
         specialist: true,
       },
     });
@@ -95,7 +81,7 @@ export class QueueService {
 
     return {
       queueId: queue.id,
-      discipline: queue.discipline.name,
+      discipline: queue.discipline,
       table: queue.specialist?.table,
       status: queue.status,
       position: aheadInQueue + 1,
@@ -137,9 +123,6 @@ export class QueueService {
       orderBy: {
         createdAt: 'asc',
       },
-      include: {
-        discipline: true,
-      },
     });
 
     if (!nextQueue) {
@@ -156,7 +139,7 @@ export class QueueService {
 
     return {
       queueId: updated.id,
-      discipline: nextQueue.discipline.name,
+      discipline: nextQueue.discipline,
       message: 'Абитуриент вызван',
     };
   }
@@ -170,9 +153,6 @@ export class QueueService {
       },
       orderBy: {
         createdAt: 'asc',
-      },
-      include: {
-        discipline: true,
       },
     });
 
@@ -188,7 +168,7 @@ export class QueueService {
       current: current
         ? {
             id: current.id,
-            discipline: current.discipline.name,
+            discipline: current.discipline,
             status: current.status,
             startedAt: current.createdAt,
           }

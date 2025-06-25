@@ -8,7 +8,6 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { QueueService } from './queue.service';
-import { CreateQueueDto } from './dto/create-queue.dto';
 import {
   ApiBody,
   ApiOperation,
@@ -33,14 +32,10 @@ export class QueueController {
     summary: 'Создание очереди',
     description: 'Создает запись очереди для определнного стола',
   })
-  @ApiBody({
-    type: CreateQueueDto,
-    description: 'Данные для создания очереди',
-  })
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  create(@Body() createQueueDto: CreateQueueDto) {
-    return this.queueService.create(createQueueDto);
+  create() {
+    return this.queueService.create();
   }
 
   @ApiOperation({
