@@ -19,7 +19,10 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Authorization header missing');
     }
 
-    const token = authHeader.split(';')[0].trim().split('=')[1];
+    const token = authHeader
+      ?.split(';')
+      .find((c) => c.trim().startsWith('accessToken='))
+      ?.split('=')[1];
 
     try {
       const decoded = this.jwtService.verify(token);
