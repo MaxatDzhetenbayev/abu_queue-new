@@ -210,7 +210,7 @@ export class QueueService {
 
     const tableQueues = specialists.map((table) => ({
       table: table.table,
-      queue: table.queues[0].id,
+      queue: table.queues[0]?.id ?? null,
     }));
 
     return tableQueues;
